@@ -27,31 +27,38 @@ public class ChessRules
         }
 
         // checks if there is a chess piece on a given position/spot
-        private boolean CheckForPiece(ChessPiece origonalPiece, ArrayList<ChessPiece> board, int x, int y)
+        private int CheckForPiece(ChessPiece origonalPiece, ArrayList<ChessPiece> board, int x, int y)
         {
             // looping through all the pieces
+            int i = 0;
             for (ChessPiece piece : board)
             {
                 // checking if the piece is at the location being checked
-                if (piece != origonalPiece && piece.GetX() == x && piece.GetY() == y) return true;
+                if (piece != origonalPiece && piece.GetX() == x && piece.GetY() == y) return i;
+                i++;
             }
+
             // no pieces overlap the location given
-            return false;
+            return -1;
         }
 
         // checks if there are any pieces on the path
         private boolean CheckForPiecesOnPath(ChessPiece origonalPiece, ArrayList<ChessPiece> board, int factor, int x, int y)
         {
             // checking for pieces along the path
-            for (int i = 0; i <= factor; i++)
+            for (int i = 0; i < factor; i++)
             {
                 // checking for a piece at the location
-                if (CheckForPiece(origonalPiece, board, x, y)) return true;
+                if (CheckForPiece(origonalPiece, board, x, y) != -1) return true;
 
                 // moving the pieces position
                 x += dirX;
                 y += dirY;
             }
+
+            // checking if the final square has a piece on it and if it does check that it's a different color
+            int finalSquare = CheckForPiece(origonalPiece, board, x, y);
+            if (finalSquare != -1 && board.get(finalSquare).GetSide() == origonalPiece.GetSide()) return true;  // you can't kill yourself
 
             // there were no pieces found
             return false;
