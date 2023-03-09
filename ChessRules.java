@@ -2,11 +2,88 @@ import java.util.ArrayList;
 
 public class ChessRules
 {
+    // checks if there is a chess piece on a given position/spot
+    private static int CheckForPiece(ChessPiece origonalPiece, ArrayList<ChessPiece> board, int x, int y)
+    {
+        // looping through all the pieces
+        int i = 0;
+        for (ChessPiece piece : board)
+        {
+            // checking if the piece is at the location being checked
+            if (piece != origonalPiece && piece.GetX() == x && piece.GetY() == y) return i;
+            i++;
+        }
+
+        // no pieces overlap the location given
+        return -1;
+    }
+
     // the base rule
     public static class BaseRule
     {
         // checks if a move is valid
         public boolean CheckMove(int newX, int newY, ChessPiece piece, ArrayList<ChessPiece> board) {  return true;  }
+    }
+
+    // the jump rule for jumping positions
+    public static class JumpRule extends BaseRule
+    {
+        // the change in position allowed by the move
+        private int changeX;
+        private int changeY;
+
+        // info on if it can kill or needs to kill
+        private boolean canKill;
+        private boolean needsKill;
+
+        // the row it has to be on for the move to be preformed (-1 means any)
+        private int row;
+
+        public JumpRule(int changeX, int changeY, boolean canKill, boolean needsKill)
+        {
+            this.changeX = changeX;
+            this.changeY = changeY;
+
+            this.canKill = canKill;
+            this.needsKill = needsKill;
+
+            this.row = -1;  // disabled / any row
+        }
+
+        public JumpRule(int changeX, int changeY, boolean canKill, boolean needsKill, int row)
+        {
+            this.changeX = changeX;
+            this.changeY = changeY;
+
+            this.canKill = canKill;
+            this.needsKill = needsKill;
+
+            this.row = row;
+        }
+
+        // checks if the move is valid
+        public boolean CheckMove(int newX, int newY, ChessPiece piece, ArrayList<ChessPiece> board)
+        {
+            if (row != -1 && row != piece.GetY()) return false;  // the wrong row for preforming the move
+
+            // the change in position
+            int difX = newX - piece.GetX();
+            int difY = newY - piece.GetY();
+
+            int kill = CheckForPiece(piece, board, newX, newY);
+
+            // checking if a kill would happen
+            if (kill != -1)
+            {
+                // checking if the move can cause a kill
+                if (!canKill) return false;
+                // checking if the kill is valid and that the move is valid
+                return (board.get(kill).GetSide() != piece.GetSide()) && (difX == changeX) && (difY == changeY);
+            }
+
+            // returning if the jump is valid
+            return (!needsKill) && (difX == changeX) && (difY == changeY);
+        }
     }
 
     // the slide rule
@@ -26,34 +103,21 @@ public class ChessRules
             this.maxLength = maxLength;
         }
 
-        // checks if there is a chess piece on a given position/spot
-        private int CheckForPiece(ChessPiece origonalPiece, ArrayList<ChessPiece> board, int x, int y)
-        {
-            // looping through all the pieces
-            int i = 0;
-            for (ChessPiece piece : board)
-            {
-                // checking if the piece is at the location being checked
-                if (piece != origonalPiece && piece.GetX() == x && piece.GetY() == y) return i;
-                i++;
-            }
-
-            // no pieces overlap the location given
-            return -1;
-        }
-
         // checks if there are any pieces on the path
         private boolean CheckForPiecesOnPath(ChessPiece origonalPiece, ArrayList<ChessPiece> board, int factor, int x, int y)
         {
+            // getting the sign of factor
+            int sign = factor / Math.abs(factor);
+
             // checking for pieces along the path
-            for (int i = 0; i < factor; i++)
+            for (int i = 0; i < Math.abs(factor); i++)
             {
                 // checking for a piece at the location
                 if (CheckForPiece(origonalPiece, board, x, y) != -1) return true;
 
                 // moving the pieces position
-                x += dirX;
-                y += dirY;
+                x += dirX * sign;
+                y += dirY * sign;
             }
 
             // checking if the final square has a piece on it and if it does check that it's a different color
@@ -77,7 +141,7 @@ public class ChessRules
 
             // checking if the piece is in the correct direction
             float factor = (float) dx / dirX;
-            if (dy / factor == (float) dirY && factor <= maxLength && Math.floor(factor) == Math.ceil(factor))
+            if (dy / factor == (float) dirY && Math.abs(factor) <= maxLength && Math.floor(factor) == Math.ceil(factor))
             {
                 // checking if there are pieces in the way
                 return !CheckForPiecesOnPath(piece, board, (int) factor, xOld, yOld);

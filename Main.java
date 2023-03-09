@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Main
 {
@@ -10,6 +11,8 @@ public class Main
 
         // adding the slide rule
         rules.add(new ChessRules.SlideRule(1, 1, 6));
+        rules.add(new ChessRules.JumpRule(3, 3, true, false));
+        rules.add(new ChessRules.JumpRule(6, 6, true, false));
 
         // creating the board
         ArrayList<ChessPiece> board = new ArrayList<>();
@@ -29,9 +32,10 @@ public class Main
         System.out.println(piece.CheckMove(4, 4, board));
         System.out.println(piece.CheckMove(5, 5, board));
         System.out.println(piece.CheckMove(6, 6, board));
-        System.out.println(piece.CheckMove(7, 7, board));*/
+        System.out.println(piece.CheckMove(7, 7, board));//*/
 
-        // rnbqkbnr/pppppppp/////PPPPPPPP/RNBQKBNR
+        System.out.println("check move: " + CheckMove("rn1qkbnr/pppppppp/2B/1b///PPPPPPPP/RNBQK1NR", 1, 3, 2, 2));
+
         // rnbqkbnr/pppppppp/////PPPPPPPP/RNBQKBNR
         // pawn = "P", knight = "N", bishop = "B", rook = "R", queen = "Q" and king = "K"
         // r: rook
@@ -41,45 +45,26 @@ public class Main
         // k: king
         // p: pawn
 
-        // 6br/7p/2p1k1pP/rpPp1pP/pP1PpP/P1K1P//
-        // 6br/7p/2p1k1pP/rpPp1pP/pP1PpP/P1K1P
-        board = GetPiecesFromFenString("rnbqkbnr/pppppppp/////PPPPPPPP/RNBQKBNR");
-
-        /*board.add(new ChessPiece(0, 0, ChessPiece.Sides.Black, "r", rules));
-        board.add(new ChessPiece(1, 0, ChessPiece.Sides.Black, "n", rules));
-        board.add(new ChessPiece(2, 0, ChessPiece.Sides.Black, "b", rules));
-        board.add(new ChessPiece(3, 0, ChessPiece.Sides.Black, "q", rules));
-        board.add(new ChessPiece(4, 0, ChessPiece.Sides.Black, "k", rules));
-        board.add(new ChessPiece(5, 0, ChessPiece.Sides.Black, "b", rules));
-        board.add(new ChessPiece(6, 0, ChessPiece.Sides.Black, "n", rules));
-        board.add(new ChessPiece(7, 0, ChessPiece.Sides.Black, "r", rules));
-        board.add(new ChessPiece(0, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(1, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(2, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(3, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(4, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(5, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(6, 1, ChessPiece.Sides.Black, "p", rules));
-        board.add(new ChessPiece(7, 1, ChessPiece.Sides.Black, "p", rules));
-
-        board.add(new ChessPiece(0, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(1, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(2, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(3, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(4, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(5, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(6, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(7, 6, ChessPiece.Sides.White, "p", rules));
-        board.add(new ChessPiece(0, 7, ChessPiece.Sides.White, "r", rules));
-        board.add(new ChessPiece(1, 7, ChessPiece.Sides.White, "n", rules));
-        board.add(new ChessPiece(2, 7, ChessPiece.Sides.White, "b", rules));
-        board.add(new ChessPiece(3, 7, ChessPiece.Sides.White, "q", rules));
-        board.add(new ChessPiece(4, 7, ChessPiece.Sides.White, "k", rules));
-        board.add(new ChessPiece(5, 7, ChessPiece.Sides.White, "b", rules));
-        board.add(new ChessPiece(6, 7, ChessPiece.Sides.White, "n", rules));
-        board.add(new ChessPiece(7, 7, ChessPiece.Sides.White, "r", rules));*/
-
+        //board = GetPiecesFromFenString("rnbqkbnr/pppppppp/////PPPPPPPP/RNBQKBNR");
         System.out.println(GetFenString(board));
+    }
+
+    // checks if a move is valid
+    public static boolean CheckMove(String fenString, int oldX, int oldY, int newX, int newY)
+    {
+        // loading the board
+        ArrayList<ChessPiece> board = GetPiecesFromFenString(fenString);
+
+        // finding the piece being moved
+        ChessPiece piece = null;
+        for (ChessPiece p : board)
+            if (p.GetX() == oldX && p.GetY() == oldY) {  piece = p; break;  }
+
+        // checking if no piece was found
+        if (piece == null) return false;
+
+        // checking if that move is valid
+        return piece.CheckMove(newX, newY, board);
     }
 
     // a basic bubble sort for sorting an array list of chess pieces
@@ -120,6 +105,67 @@ public class Main
 
     public static ArrayList<ChessPiece> GetPiecesFromFenString(String fenString)
     {
+        // create a hash map of rules for different pieces
+        HashMap<String, ArrayList<ChessRules.BaseRule>> rules = new HashMap<>();
+        ArrayList<ChessRules.BaseRule> pieceRules;
+
+        // r: rook
+        // n: knight
+        // b: bishop
+        // q: queen
+        // k: king
+        // p: pawn
+
+        // top pieces
+        pieceRules = new ArrayList<>();
+        rules.put("r", pieceRules);  // black rook
+
+        pieceRules = new ArrayList<>();
+        rules.put("n", pieceRules);  // black knight
+
+        pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.SlideRule(-1, 1, 100));
+        pieceRules.add(new ChessRules.SlideRule(1, 1, 100));
+        rules.put("b", pieceRules);  // black bishop
+
+        pieceRules = new ArrayList<>();
+        rules.put("q", pieceRules);  // black queen
+
+        pieceRules = new ArrayList<>();
+        rules.put("k", pieceRules);  // black king
+
+        pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.JumpRule(0, 2, false, false, 1));
+        pieceRules.add(new ChessRules.JumpRule(0, 1, false, false));
+        pieceRules.add(new ChessRules.JumpRule(-1, 1, true, true));
+        pieceRules.add(new ChessRules.JumpRule(1, 1, true, true));
+        rules.put("p", pieceRules);  // black pawn
+
+        // bottom pieces
+        pieceRules = new ArrayList<>();
+        rules.put("R", pieceRules);  // white rook
+
+        pieceRules = new ArrayList<>();
+        rules.put("N", pieceRules);  // white knight
+
+        pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.SlideRule(-1, 1, 100));
+        pieceRules.add(new ChessRules.SlideRule(1, 1, 100));
+        rules.put("B", pieceRules);  // white bishop
+
+        pieceRules = new ArrayList<>();
+        rules.put("Q", pieceRules);  // white queen
+
+        pieceRules = new ArrayList<>();
+        rules.put("K", pieceRules);  // white king
+
+        pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.JumpRule(0, -2, false, false, 6));
+        pieceRules.add(new ChessRules.JumpRule(0, -1, false, false));
+        pieceRules.add(new ChessRules.JumpRule(-1, -1, true, true));
+        pieceRules.add(new ChessRules.JumpRule(1, -1, true, true));
+        rules.put("P", pieceRules);  // white pawn
+
         // the current position
         int x = 0;
         int y = 0;
@@ -139,8 +185,8 @@ public class Main
             else if (letter.equals("/")) {y++; x = 0;}
             else
             {
-                if (letter.toUpperCase().equals(letter)) pieces.add(new ChessPiece(x, y, ChessPiece.Sides.White, letter.toLowerCase(), new ArrayList<>()));
-                else pieces.add(new ChessPiece(x, y, ChessPiece.Sides.Black, letter, new ArrayList<>()));
+                if (letter.toUpperCase().equals(letter)) pieces.add(new ChessPiece(x, y, ChessPiece.Sides.White, letter.toLowerCase(), rules.get(letter)));
+                else pieces.add(new ChessPiece(x, y, ChessPiece.Sides.Black, letter, rules.get(letter)));
                 x++;
             }
         }

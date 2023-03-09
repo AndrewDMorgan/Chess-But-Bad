@@ -28,15 +28,17 @@ public class ChessPiece
     // checks if a move is valid
     public boolean CheckMove(int newX, int newY, ArrayList<ChessPiece> board)
     {
+        if (newX < 0 || newX > 7 || newY < 0 || newY > 7) return false;  // the piece is being moved off the board (shouldn't happen unless faulty data is given)
+
         // looping through all the rules and making sure they're all valid
         for (ChessRules.BaseRule rule : rules)
         {
             // checking if the rule is valid
-            if (!rule.CheckMove(newX, newY, this, board)) return false;
+            if (rule.CheckMove(newX, newY, this, board)) return true;
         }
 
         // all the rules are valid with this move
-        return true;
+        return false;
     }
 
     // gets the side the piece is on
