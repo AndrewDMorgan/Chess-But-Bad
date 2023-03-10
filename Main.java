@@ -6,7 +6,7 @@ public class Main
 {
     public static void main(String[] args)
     {
-        System.out.println("check move: " + CheckMove("rn1qkbnr/pppppppp/2B/1b///PPPPPPPP/RNBQK1NR", 1, 3, 2, 2));
+        System.out.println("check move: " + CheckMove("rnbqkbnr/pppppppp/////PPPPPPPP/RNBQKBNR", 4, 6, 4, 4));
 
         // rnbqkbnr/pppppppp/////PPPPPPPP/RNBQKBNR
         // pawn = "P", knight = "N", bishop = "B", rook = "R", queen = "Q" and king = "K"
@@ -109,6 +109,10 @@ public class Main
         rules.put("b", pieceRules);  // black bishop
 
         pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.SlideRule(1, 0, 100));
+        pieceRules.add(new ChessRules.SlideRule(0, 1, 100));
+        pieceRules.add(new ChessRules.SlideRule(-1, 1, 100));
+        pieceRules.add(new ChessRules.SlideRule(1, 1, 100));
         rules.put("q", pieceRules);  // black queen
 
         pieceRules = new ArrayList<>();
@@ -145,6 +149,10 @@ public class Main
         rules.put("B", pieceRules);  // white bishop
 
         pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.SlideRule(1, 0, 100));
+        pieceRules.add(new ChessRules.SlideRule(0, 1, 100));
+        pieceRules.add(new ChessRules.SlideRule(-1, 1, 100));
+        pieceRules.add(new ChessRules.SlideRule(1, 1, 100));
         rules.put("Q", pieceRules);  // white queen
 
         pieceRules = new ArrayList<>();
