@@ -143,7 +143,7 @@ public class ChessRules
             if (dirX == 0)
             {
                 float factor = (float) dy / dirY;
-                if (dx / factor == (float) dirY && Math.abs(factor) <= maxLength && Math.floor(factor )== Math.ceil(factor))
+                if (dx / factor == (float) dirX && Math.abs(factor) <= maxLength && Math.floor(factor )== Math.ceil(factor))
                 {
                     // checking if there are pieces in the way
                     return !CheckForPiecesOnPath(piece, board, (int) factor, xOld, yOld);
