@@ -139,12 +139,24 @@ public class ChessRules
             int dx = newX - xOld;
             int dy = newY - yOld;
 
-            // checking if the piece is in the correct direction
-            float factor = (float) dx / dirX;
-            if (dy / factor == (float) dirY && Math.abs(factor) <= maxLength && Math.floor(factor) == Math.ceil(factor))
+            // checking if the piece is moving in the correct direction and within bounds of the slide
+            if (dirX == 0)
             {
-                // checking if there are pieces in the way
-                return !CheckForPiecesOnPath(piece, board, (int) factor, xOld, yOld);
+                float factor = (float) dy / dirY;
+                if (dx / factor == (float) dirY && Math.abs(factor) <= maxLength && Math.floor(factor )== Math.ceil(factor))
+                {
+                    // checking if there are pieces in the way
+                    return !CheckForPiecesOnPath(piece, board, (int) factor, xOld, yOld);
+                }
+            }
+            else
+            {
+                float factor = (float) dx / dirX;
+                if (dy / factor == (float) dirY && Math.abs(factor) <= maxLength && Math.floor(factor) == Math.ceil(factor))
+                {
+                    // checking if there are pieces in the way
+                    return !CheckForPiecesOnPath(piece, board, (int) factor, xOld, yOld);
+                }
             }
 
             return false;
