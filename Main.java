@@ -6,7 +6,7 @@ public class Main
 {
     public HashMap<String, ArrayList<ChessRules.BaseRule>> pieceRules;
 
-    public void Main()
+    public Main()
     {
         // create a hash map of rules for different pieces
         pieceRules = new HashMap<>();
