@@ -116,6 +116,10 @@ public class Main
         rules.put("q", pieceRules);  // black queen
 
         pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.SlideRule(1, 0, 1));
+        pieceRules.add(new ChessRules.SlideRule(0, 1, 1));
+        pieceRules.add(new ChessRules.SlideRule(-1, 1, 1));
+        pieceRules.add(new ChessRules.SlideRule(1, 1, 1));
         rules.put("k", pieceRules);  // black king
 
         pieceRules = new ArrayList<>();
@@ -156,6 +160,10 @@ public class Main
         rules.put("Q", pieceRules);  // white queen
 
         pieceRules = new ArrayList<>();
+        pieceRules.add(new ChessRules.SlideRule(1, 0, 1));
+        pieceRules.add(new ChessRules.SlideRule(0, 1, 1));
+        pieceRules.add(new ChessRules.SlideRule(-1, 1, 1));
+        pieceRules.add(new ChessRules.SlideRule(1, 1, 1));
         rules.put("K", pieceRules);  // white king
 
         pieceRules = new ArrayList<>();
