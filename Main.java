@@ -18,7 +18,7 @@ public class Main
         // q: queen
         // k: king
         // p: pawn
-
+        
         // top pieces
         rules = new ArrayList<>();
         rules.add(new ChessRules.SlideRule(1, 0, 100));
@@ -127,8 +127,13 @@ public class Main
         int dY = newKingY - oldKingY;
 
         // checking if the change in position is 2 left or right and none up and down, then checking if the path is clear to the rook
-        if ((dX == 2 || dX == -2) && dY == 0)
-            return ChessRules.CheckForPiecesOnPath(piece, board, 4 * (dX / Math.abs(dX)), 1, 1, oldKingX, oldKingY, true);
+        if (dY == 0)
+        {
+            if (dX == 2)
+                return !ChessRules.CheckForPiecesOnPath(piece, board, 3, 1, 0, oldKingX, oldKingY, true);
+            else if (dX == -2)
+                return !ChessRules.CheckForPiecesOnPath(piece, board, -4, 1, 0, oldKingX, oldKingY, true);
+        }
 
         // wasn't a valid castling
         return false;
