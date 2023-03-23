@@ -14,6 +14,7 @@ public class ChessPiece
     private int y;
     private Sides side;
     private String pieceChar;
+    private boolean enPassant = false;
     private ArrayList<ChessRules.BaseRule> rules;
 
     public ChessPiece(int x, int y, Sides side, String pieceChar, ArrayList<ChessRules.BaseRule> rules)
@@ -24,6 +25,10 @@ public class ChessPiece
         this.pieceChar = pieceChar;
         this.rules = rules;
     }
+
+    // sets and gets enPassant
+    public void SetEnPassant(boolean valid) {  enPassant = valid;  }
+    public boolean GetEnPassant() {  return enPassant;  }
 
     // checks if a move is valid
     public boolean CheckMove(int newX, int newY, ArrayList<ChessPiece> board)

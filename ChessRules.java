@@ -50,6 +50,37 @@ public class ChessRules
         public boolean CheckMove(int newX, int newY, ChessPiece piece, ArrayList<ChessPiece> board) {  return true;  }
     }
 
+    // the en passant rule
+    public static class EnPassant extends BaseRule
+    {
+        // the movement pattern
+        private int changeX;
+        private int changeY;
+
+        public EnPassant(int changeX, int changeY)
+        {
+            this.changeX = changeX;
+            this.changeY = changeY;
+        }
+
+        // checks if the move is valid
+        public boolean CheckMove(int newX, int newY, ChessPiece piece, ArrayList<ChessPiece> board)
+        {
+            // the change in position
+            int difX = newX - piece.GetX();
+            int difY = newY - piece.GetY();
+
+            // making sure the movement is correct
+            if (difX != changeX || difY != changeY) return false;
+
+            // getting the adjacent piece
+            ChessPiece adjacent = new Main().GetPiece(board, newX, piece.GetY());
+
+            // making sure that piece can be taken by en passant (aka just moved two squares up/down)
+            return adjacent.GetEnPassant();
+        }
+    }
+
     // the jump rule for jumping positions
     public static class JumpRule extends BaseRule
     {
