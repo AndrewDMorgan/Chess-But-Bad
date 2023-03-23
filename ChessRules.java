@@ -74,10 +74,14 @@ public class ChessRules
             if (difX != changeX || difY != changeY) return false;
 
             // getting the adjacent piece
-            ChessPiece adjacent = new Main().GetPiece(board, newX, piece.GetY());
+            Main main = new Main();
+            ChessPiece adjacent = main.GetPiece(board, newX, piece.GetY());
 
-            // making sure that piece can be taken by en passant (aka just moved two squares up/down)
-            return adjacent.GetEnPassant();
+            // making sure there is a piece there
+            if (adjacent == null) return false;
+
+            // making sure that piece can be taken by en passant (aka just moved two squares up/down), also making sure it's not jumping onto a piece
+            return adjacent.GetEnPassant() && main.GetPiece(board, newX, newY) == null;
         }
     }
 
