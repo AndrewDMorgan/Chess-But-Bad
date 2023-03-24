@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 public class Main
 {
-    public HashMap<String, ArrayList<ChessRules.BaseRule>> pieceRules;
+    private HashMap<String, ArrayList<ChessRules.BaseRule>> pieceRules;
+    private static ArrayList<String> letters;
 
     public Main()
     {
@@ -18,7 +19,12 @@ public class Main
         // q: queen
         // k: king
         // p: pawn
-        
+
+        // an array of the valid letters for pieces (to screen for invalid chars when loading fens)
+        letters = new ArrayList<>();
+        letters.add("r"); letters.add("n"); letters.add("b"); letters.add("q"); letters.add("k"); letters.add("p");
+        letters.add("R"); letters.add("N"); letters.add("B"); letters.add("Q"); letters.add("K"); letters.add("P");
+
         // top pieces
         rules = new ArrayList<>();
         rules.add(new ChessRules.SlideRule(1, 0, 100));
@@ -173,60 +179,62 @@ public class Main
         if (piece == null) return false;
 
         // loading the previous move to check validity of en passant
-        ArrayList<ChessPiece> oldBoard = GetPiecesFromFenString(lastFenString);
-
-        // finding the number of pieces
-        int numberPieces = board.size();
-        if (oldBoard.size() == numberPieces)
+        if (lastFenString != null)
         {
-            // getting the position of pieces
-            int[] xPossesOld = new int[numberPieces];
-            int[] yPossesOld = new int[numberPieces];
+            ArrayList<ChessPiece> oldBoard = GetPiecesFromFenString(lastFenString);
 
-            int[] xPossesNew = new int[numberPieces];
-            int[] yPossesNew = new int[numberPieces];
-
-            int i = 0;
-            for (ChessPiece p : oldBoard) {  xPossesOld[i] = p.GetX(); yPossesOld[i] = p.GetY(); i++;  }
-            i = 0;
-            for (ChessPiece p : board) {  xPossesNew[i] = p.GetX(); yPossesNew[i] = p.GetY(); i++;  }
-
-            // finding which pieces have no overlap
-            ArrayList<Integer> nonOverlapsOld = new ArrayList<>();
-            ArrayList<Integer> nonOverlapsNew = new ArrayList<>();
-
-            for (i = 0; i < numberPieces; i++)
+            // finding the number of pieces
+            int numberPieces = board.size();
+            if (oldBoard.size() == numberPieces)
             {
-                // checking the old piece
-                int index = CheckForIntSet(xPossesNew, yPossesNew, xPossesOld[i], yPossesOld[i]);
-                if (index == -1) nonOverlapsOld.add(i);
+                // getting the position of pieces
+                int[] xPossesOld = new int[numberPieces];
+                int[] yPossesOld = new int[numberPieces];
 
-                // checking the new piece
-                index = CheckForIntSet(xPossesOld, yPossesOld, xPossesNew[i], yPossesNew[i]);
-                if (index == -1) nonOverlapsNew.add(i);
-            }
+                int[] xPossesNew = new int[numberPieces];
+                int[] yPossesNew = new int[numberPieces];
 
-            // making sure only 1 piece moved (aka no casting)
-            if (nonOverlapsOld.size() == 1 && nonOverlapsNew.size() == 1)
-            {
-                // getting the indexes and positions of the moved pieces
-                int oldIndex = nonOverlapsOld.get(0);
-                int xOld = xPossesOld[oldIndex];
-                int yOld = yPossesOld[oldIndex];
+                int i = 0;
+                for (ChessPiece p : oldBoard) {  xPossesOld[i] = p.GetX(); yPossesOld[i] = p.GetY(); i++;  }
+                i = 0;
+                for (ChessPiece p : board) {  xPossesNew[i] = p.GetX(); yPossesNew[i] = p.GetY(); i++;  }
 
-                int newIndex = nonOverlapsNew.get(0);
-                int xNew = xPossesNew[newIndex];
-                int yNew = yPossesNew[newIndex];
+                // finding which pieces have no overlap
+                ArrayList<Integer> nonOverlapsOld = new ArrayList<>();
+                ArrayList<Integer> nonOverlapsNew = new ArrayList<>();
 
-                // finding the individual pieces
-                ChessPiece oldPiece = oldBoard.get(oldIndex);
-                ChessPiece newPiece = board.get(newIndex);
-
-                // making sure they're both pawns, and that they moved two spaces down, none over, and they are both the same color
-                int difY = newY - oldY;
-                if (oldPiece.GetChar().equals(newPiece.GetChar()) && oldPiece.GetChar().equalsIgnoreCase("p") && xOld == xNew && Math.abs(difY) == 2)
+                for (i = 0; i < numberPieces; i++)
                 {
-                    newPiece.SetEnPassant(true);  // making it so this piece can be taken by en passant
+                    // checking the old piece
+                    int index = CheckForIntSet(xPossesNew, yPossesNew, xPossesOld[i], yPossesOld[i]);
+                    if (index == -1) nonOverlapsOld.add(i);
+
+                    // checking the new piece
+                    index = CheckForIntSet(xPossesOld, yPossesOld, xPossesNew[i], yPossesNew[i]);
+                    if (index == -1) nonOverlapsNew.add(i);
+                }
+
+                // making sure only 1 piece moved (aka no casting)
+                if (nonOverlapsOld.size() == 1 && nonOverlapsNew.size() == 1)
+                {
+                    // getting the indexes and positions of the moved pieces
+                    int oldIndex = nonOverlapsOld.get(0);
+                    int xOld = xPossesOld[oldIndex];
+                    int yOld = yPossesOld[oldIndex];
+
+                    int newIndex = nonOverlapsNew.get(0);
+                    int xNew = xPossesNew[newIndex];
+                    int yNew = yPossesNew[newIndex];
+
+                    // finding the individual pieces
+                    ChessPiece oldPiece = oldBoard.get(oldIndex);
+                    ChessPiece newPiece = board.get(newIndex);
+
+                    // making sure they're both pawns, and that they moved two spaces down, none over, and they are both the same color
+                    if (oldPiece.GetChar().equals(newPiece.GetChar()) && oldPiece.GetChar().equalsIgnoreCase("p") && xOld == xNew && Math.abs(yNew - yOld) == 2)
+                    {
+                        newPiece.SetEnPassant(true);  // making it so this piece can be taken by en passant
+                    }
                 }
             }
         }
@@ -290,7 +298,7 @@ public class Main
             // operating based on the character
             if (isInt != -1) x += isInt;
             else if (letter.equals("/")) {y++; x = 0;}
-            else
+            else if (letters.contains(letter))
             {
                 if (letter.toUpperCase().equals(letter)) pieces.add(new ChessPiece(x, y, ChessPiece.Sides.White, letter.toLowerCase(), pieceRules.get(letter)));
                 else pieces.add(new ChessPiece(x, y, ChessPiece.Sides.Black, letter, pieceRules.get(letter)));
